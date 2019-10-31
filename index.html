@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+    <style type="text/css">
+    body {
+        font-family: sans-serif;
+        background-color: #e0e1e0;
+        margin: 0;
+    }
+
+    .banneri {
+      background-color: #20a5f2;
+      color: #262626;
+      text-align: center;
+      width: 100%;
+      font-size: 2em;
+      font-weight: 500;
+      padding: 25px;
+    }
+
+    .haku-otsikko {
+        display: flex;
+        justify-content: center;
+    }
+
+    .haku-asetukset {
+        display: table-cell;
+        width: 180px;
+        height: 265px;
+    }
+
+    .pudotusvalikko {
+      width: 185px;
+    }
+
+
+    .haku-ohjeet {
+        width: 610px;
+        margin-left: 20px;
+        height: 265px;
+    }
+
+    .paneeli {
+      background-color: #f5f5f6;
+      padding: 15px;
+      margin: 20px;
+    }
+    .tulokset {
+      display: table;
+    }
+
+    .mb-15px {
+      margin-bottom: 15px;
+    }
+
+    .mt--15px {
+      margin-top: -15px;
+    }
+
+    th {
+        padding-top: 10px;
+        border-bottom: 1px solid black;
+        text-align: left;
+        padding: 5px;
+    }
+
+    .otsikkorivi {
+      position: sticky;
+      top: 0;
+      background-color: #f5f5f6;
+    }
+
+    .solun-indeksi-10 {
+      width: 100px;
+    }
+
+    td {
+      padding: 5px;
+    }
+
+    </style>
+
+    <script>
+
+    function js_print(msg){
+      console.log(msg);
+    }
+
+    function hakukutsuttu(){
+
+      const aputiedot = document.getElementById("tiedot");
+      console.log("tiedot1", aputiedot.options[aputiedot.selectedIndex]);
+      const tiedot = aputiedot.options[aputiedot.selectedIndex].value;
+      const apututkimusala = document.getElementById("tutkimusala");
+      console.log("tiedot2", apututkimusala.options[apututkimusala.selectedIndex]);
+      const tutkimusala = apututkimusala.options[apututkimusala.selectedIndex].value;
+      const apuaihe = document.getElementById("aihe");
+      console.log("tiedot3", apuaihe.options[apuaihe.selectedIndex]);
+      const aihe = (tiedot === "Bionaytteet" || tiedot === "Tutkimustiedot")
+        ? ""
+        : apuaihe.options[apuaihe.selectedIndex].value;
+
+      /*const aihe = document.getElementById("aihe").value;*/
+
+      hakukutsu(tiedot, tutkimusala, aihe, piirra_taulukko);
+
+    }
+
+    function populate(ps1,ps2){
+      let s1 = document.getElementById(ps1)
+      let s2 = document.getElementById(ps2)
+      s2.innerHTML = "";
+      let optionArray = [];
+
+      if(s1.value === "Medicine"){
+        optionArray = ["", , "Acute illness", "Allergic diseases", "Chronic diseases",
+        "Medical and hospital visits", "Pregnancy, Delivery", "Respiratory tract infection",
+        "Vaccinations",  "Weight and height"];
+      } else if(s1.value === "Nutrition"){
+           optionArray = ["", "Dietary habits", "Eating behavior"];
+      } else if(s1.value === "Demographics"){
+          optionArray = ["", "Basic informations", "Family background", "Socio-economic situation", "Study",
+          "Questionnaire information"];
+      } else if(s1.value === "Psychology"){
+           optionArray =
+          ["", "Anxiety", "Child's socio-emotional development, difficulties and environmental factors",
+          "Depression", "Family function",  "Life management", "Loneliness", "Marital satisfaction",
+          "Parenting", "Quality of life (feelings)"];
+      } else if(s1.value === "Social sciences"){
+           optionArray = ["", "Child's academic skills", "Child's play", "Family relations",
+           "Income and consumption habits", "Parenthood, child rearing",
+           "Social relationships", "Values"];
+      } else if(s1.value === "Education"){
+           optionArray = ["", "Early childhood education and care", "Primary education and special needs"];
+      } else if(s1.value === "Study information"){
+           optionArray = [""];
+      } else if(s1.value === "Social, health and child care services"){
+           optionArray = ["", "Maternity and child health clinic services", "Other services",
+          "School health services"];
+      } else if(s1.value === "Health promotion, Lifestyle habits"){
+           optionArray = ["",  "Alcohol consumption", "Brushing teeth", "Drugs", "Hobbies",
+          "Passive smoking", "Pets", "Physical activity", "Sedentary behavior (INC. TV)",
+          "Sleeping", "Smoking habits"];
+      } else if(s1.value === "Speech-language pathology"){
+           optionArray =
+          ["", "Behavior and social communication", "Development and behavior", "Language development",
+          "Language environment: Language/s spoken with the child, Reading with the child",
+          "Language/s spoken in the family, language and reading problems in the family",
+          "Listening music with the child",
+          "Oral motor development", "Possible speech or voice disorders", "Supporting language development"];
+      }
+
+      for(let option in optionArray){
+        let uusi = optionArray[option];
+        let newOption = document.createElement("option");
+        newOption.value = uusi;
+        newOption.innerHTML = uusi;
+        s2.options.add(newOption);
+      }
+    }
+
+    function populate1(ps1, ps2, ps3){
+      let s1 = document.getElementById(ps1);
+      let s2 = document.getElementById(ps2);
+      let s3 = document.getElementById(ps3);
+
+      s2.innerHTML = "";
+      s3.innerHTML = "";
+
+      let optionArray = [];
+      let optionArrayAihe = [];
+
+      if(s1.value === "Lomakkeet"){
+        optionArray = ["", "Demographics", "Education",
+        "Health promotion, Lifestyle habits", "Medicine", "Nutrition",
+        "Psychology", "Social, health and child care services", "Social sciences",
+        "Speech-language pathology", "Study information"];
+      } else if(s1.value === "Bionaytteet"){
+           optionArray = ["", "Napaverin&auml;yte", "Nen&auml;tikkun&auml;yte", "Poskisolun&auml;yte", "Rintamaiton&auml;yte", "Ulosten&auml;yte", "Verin&auml;yte"];
+           optionArrayAihe = [""];
+      } else if(s1.value === "Tutkimustiedot"){
+          optionArray = ["Biologiset n&auml;ytteet","Lomakkeet"];
+          optionArrayAihe = [""];
+      }
+
+      for(let option in optionArray){
+        let uusi = optionArray[option];
+        let newOption = document.createElement("option");
+        newOption.value = uusi;
+        newOption.innerHTML = uusi;
+        console.log("newOption", newOption);
+        s2.options.add(newOption);
+      }
+
+      for(let optionAihe in optionArrayAihe){
+        let uusiAihe = optionArrayAihe[optionAihe];
+        let newOptionAihe = document.createElement("option");
+        newOptionAihe.value = uusiAihe;
+        newOptionAihe.innerHTML = uusiAihe;
+        console.log("newOptionAihe", newOptionAihe);
+        s3.options.add(newOptionAihe);
+      }
+    }
+
+
+    function tutkittavat(rivi, tiedot) {
+        const flista = document.getElementsByClassName("tarkista");
+        const riviindeksi = (tiedot === "Lomakkeet" || tiedot === "Tutkimustiedot")
+          ? 2
+          : 1;
+        const tutkittava_alkio = rivi[riviindeksi];
+
+        return flista[0].checked && tutkittava_alkio == 1
+          || flista[1].checked && tutkittava_alkio == 2
+          || flista[2].checked && tutkittava_alkio == 3;
+    }
+
+    function piirra_taulukko([tila, data]) {
+
+        const aputiedot = document.getElementById("tiedot");
+        const tiedot = aputiedot.options[aputiedot.selectedIndex].value;
+
+        const apututkimusala = document.getElementById("tutkimusala");
+        const tutkimusala = apututkimusala.options[apututkimusala.selectedIndex].value;
+
+        console.log("tutkimusala", tutkimusala);
+
+        let taulukonData = null;
+
+        if( tiedot === "Lomakkeet" || tiedot === "Bionaytteet" || (tiedot === "Tutkimustiedot" && tutkimusala === "Biologiset n&auml;ytteet")){
+          taulukonData = data
+            .filter(rivi => tutkittavat(rivi, tiedot))
+            .map(rivi => {
+              const rivinData = rivi.map((alkio, i) => {
+                const tavutettuAlkio = typeof alkio === 'string'
+                  ? alkio.replace(new RegExp('/', 'g'), '/ ')
+                  : alkio;
+                return `<td class="solun-indeksi-${i}">${tavutettuAlkio}</td>`;
+              }).join('');
+              return(`<tr>${rivinData}</tr>`);
+          }).join('')
+        }
+
+        if( tiedot === "Tutkimustiedot" && tutkimusala === "Lomakkeet"){
+          taulukonData = data
+            .map(rivi => {
+              const rivinData = rivi.map((alkio, i) => {
+                const tavutettuAlkio = typeof alkio === 'string'
+                  ? alkio.replace(new RegExp('/', 'g'), '/ ')
+                  : alkio;
+                return `<td class="solun-indeksi-${i}">${tavutettuAlkio}</td>`;
+            }).join('');
+            return(`<tr>${rivinData}</tr>`);
+          }).join('')
+        }
+
+        let hauntila = document.getElementById("tila");
+        let haunTila = tila;
+
+        console.log("Data", data);
+
+        const flista = document.getElementsByClassName("tarkista");
+
+        /* HAUNTILA JA VIRHEILMOITUKSET */
+        if (tiedot === "Lomakkeet"){
+          console.log(tiedot);
+          if ((flista[0].checked || flista[1].checked || flista[2].checked) && taulukonData){
+            let a = 1;
+          } else if (flista[0].checked || flista[1].checked || flista[2].checked){
+            haunTila = "Hakuyhdistelm&auml;ll&auml; ei kysymyksi&auml;";
+          } else {
+            haunTila = "Virhe! Valitse tutkittava";
+          }
+        }
+
+        if (tiedot === "Bionaytteet"){
+          console.log(tiedot);
+          if ((flista[0].checked || flista[1].checked || flista[2].checked) && taulukonData){
+            let a = 1;
+          } else if (flista[0].checked || flista[1].checked || flista[2].checked){
+            haunTila = "Hakuyhdistelm&auml;ll&auml; ei n&auml;ytteit&auml;";
+          } else {
+            haunTila = "Virhe! Valitse tutkittava";
+          }
+        }
+
+        if (tiedot === "Tutkimustiedot"  && tutkimusala === "Biologiset n&auml;ytteet"){
+            console.log(tiedot);
+            if ((flista[0].checked || flista[1].checked || flista[2].checked) && taulukonData){
+              let a = 1;
+            } else if (flista[0].checked || flista[1].checked || flista[2].checked){
+              haunTila = "Hakuyhdistelm&auml;ll&auml; ei tutkimustietoja;";
+            } else {
+              haunTila = "Virhe! Valitse tutkittava";
+            }
+        }
+
+        hauntila.innerHTML = haunTila;
+
+        if (tiedot === "Lomakkeet"){
+        tulos = document.getElementById("result");
+        tulos.innerHTML = `
+          <tr class="otsikkorivi">
+            <th>Lo&shy;ma&shy;ke</th>
+            <th>Me&shy;ne&shy;tel&shy;m&auml;</th>
+            <th>Tut&shy;kit&shy;ta&shy;va</th>
+            <th>L&auml;&shy;he&shy;tet&shy;ty</th>
+            <th>MP</th>
+            <th>KK</th>
+            <th>Tut&shy;ki&shy;mus&shy;a&shy;la</th>
+            <th>Ai&shy;he</th>
+            <th>Ky&shy;sy&shy;mys&shy;paik&shy;ka</th>
+            <th>Ky&shy;sy&shy;mys</th>
+            <th class="solun-indeksi-10">For&shy;maat&shy;ti</th>
+            <th>Mit&shy;ta&shy;ri</th>
+            <th>VAL</th>
+            <th>Tie&shy;dos&shy;to</th>
+            <th>Muut&shy;tu&shy;ja tiedostossa</th>
+          </tr>
+        ${taulukonData}
+        `;
+      }
+      if (tiedot === "Bionaytteet"){
+        tulos = document.getElementById("result");
+        tulos.innerHTML = `
+        <tr class="otsikkorivi">
+          <th>Biologinen n&auml;yte</th>
+          <th>Tut&shy;kit&shy;ta&shy;va</th>
+          <th>MP</th>
+          <th>KK</th>
+          <th>Analysoitu</th>
+          <th>S&auml;ilytys</th>
+          <th>Tutkimusala</th>
+          <th>Muuttujan selitys </th>
+          <th>Formaatti</th>
+          <th>Tie&shy;dos&shy;to</th>
+          <th>Muut&shy;tu&shy;ja tiedostossa</th>
+        </tr>
+        ${taulukonData}
+        `;
+      }
+
+      if (tiedot === "Tutkimustiedot" && tutkimusala === "Lomakkeet"){
+        tulos = document.getElementById("result");
+        tulos.innerHTML = `
+        <tr class="otsikkorivi">
+          <th>HKA numero</th>
+          <th>Alkulomake</th>
+          <th>&Auml;iti 20rv</th>
+          <th>Is&auml; 20rv</th>
+          <th>&Auml;iti 30rv</th>
+          <th>Is&auml; 30rv</th>
+          <th>Rlomake</th>
+          <th>&Auml;iti 4kk</th>
+          <th>Is&auml; 4kk</th>
+          <th>Lapsi 8kk</th>
+          <th>&Auml;iti 8kk</th>
+          <th>Is&auml; 8kk</th>
+          <th>Lapsi 13kk</th>
+          <th>&Auml;iti 13kk</th>
+          <th>Is&auml; 13kk</th>
+          <th>Lapsi 18kk</th>
+          <th>&Auml;iti 18kk</th>
+          <th>Is&auml; 18kk</th>
+          <th>Lapsi 24kk</th>
+          <th>&Auml;iti 24kk</th>
+          <th>Is&auml; 24kk</th>
+          <th>P&auml;iv&auml;hoito1 2v</th>
+          <th>P&auml;iv&auml;hoito2 2v</th>
+          <th>Lapsi 3v</th>
+          <th>&Auml;iti 3v</th>
+          <th>Is&auml; 3v</th>
+          <th>P&auml;iv&auml;hoito 3v</th>
+          <th>P&auml;iv&auml;hoito Bitsea 3v</th>
+          <th>Lapsi 4v</th>
+          <th>&Auml;iti 4v</th>
+          <th>Is&auml; 4v</th>
+          <th>Lapsi 5v</th>
+          <th>&Auml;iti 5v</th>
+          <th>Is&auml; 5v</th>
+          <th>Viivi 5v</th>
+          <th>Lapsi 6v</th>
+          <th>&Auml;iti 6v</th>
+          <th>Is&auml; 6v</th>
+          <th>Esiopetus 6v</th>
+          <th>&Auml;iti 7v</th>
+          <th>Is&auml; 7v</th>
+          <th>Lapsi 8v</th>
+          <th>Opettaja 8v</th>
+        </tr>
+        ${taulukonData}
+        `;
+      }
+
+      if (tiedot === "Tutkimustiedot" && tutkimusala === "Biologiset n&auml;ytteet"){
+        tulos = document.getElementById("result");
+        tulos.innerHTML = `
+        <tr class="otsikkorivi">
+          <th>HKA numero</th>
+          <th>HKA perhenumero</th>
+          <th>Tutkit&shy;tava</th>
+          <th>K&auml;ynti 13kk</th>
+          <th>K&auml;ynti 2v</th>
+          <th>K&auml;ynti 3v</th>
+          <th>K&auml;ynti 5v</th>
+          <th>Bakteeriviljely 13kk</th>
+          <th>Bakteeriviljely 2v</th>
+          <th>Buffy coat 13kk</th>
+          <th>Buffy coat 2v</th>
+          <th>Buffy coat 3v</th>
+          <th>Buffy coat 5v</th>
+          <th>Nen&auml;tikkun&auml;yte</th>
+          <th>Poskisolun&auml;yte</th>
+          <th>Rintamaiton&auml;yte</th>
+          <th>THL 13kk</th>
+          <th>THL 2v</th>
+          <th>Ulosten&auml;yte 1kk</th>
+          <th>Ulosten&auml;yte 3kk</th>
+          <th>Ulosten&auml;yte 13kk</th>
+          <th>Verin&auml;yte EDTA 3v</th>
+          <th>Verin&auml;yte EDTA 5v</th>
+          <th>Verin&auml;yte Plasma 13kk</th>
+          <th>Verin&auml;yte Plasma 2v</th>
+          <th>Verin&auml;yte Plasma 3v</th>
+          <th>Verin&auml;yte Plasma 5v</th>
+          <th>Verin&auml;yte Seerumi 13kk</th>
+          <th>Verin&auml;yte Seerumi 2v</th>
+          <th>Verin&auml;yte Seerumi 3v</th>
+          <th>Verin&auml;yte Seerumi 5v</th>
+          <th>P-Kol 13kk</th>
+          <th>P-Kol-Hdl 13kk</th>
+          <th>Hdl-Kol 13kk</th>
+          <th>P-Kol 2v</th>
+          <th>P-Kol-Hdl 2v</th>
+          <th>Hdl-Kol 2v</th>
+          <th>P-Kol 3v</th>
+          <th>P-Kol-Hdl 3v</th>
+          <th>Hdl-Kol 3v</th>
+        </tr>
+        ${taulukonData}
+        `;
+      }
+}
+
+    </script>
+</head>
+
+<!-- Kommentti: HTML eli sovelluksen rakennepalikat -->
+
+<body>
+    <div class="banneri">
+      HKA -tutkimuksen datatietoja
+    </div>
+    <div class="haku-otsikko">
+      <div class="haku-asetukset paneeli mt--15px">
+        Tiedot <br>
+        <select id="tiedot" name="tiedot" class="pudotusvalikko mb-15px" onchange="populate1('tiedot', 'tutkimusala', 'aihe')">
+          <option disabled selected value> -- Valitse haettavat tiedot -- </option>
+          <option value="Bionaytteet">Biologiset n&auml;ytteet</option>
+          <option value="Lomakkeet">Lomakkeet</option>
+          <option value="Tutkimustiedot">Tutkimustiedot</option>
+        </select> <br>
+        Tutkimusala \ N&auml;yte <br>
+        <select id="tutkimusala" name="tutkimusala" class="pudotusvalikko mb-15px" onchange="populate('tutkimusala', 'aihe')">
+        </select> <br>
+        Aihe (valinnainen) <br>
+        <select id="aihe" name="aihe" class="pudotusvalikko mb-15px"></select>
+        <!-- <input type="text" placeholder="Aihe - valinnainen" id="aihe" class="mb-15px" /> -->
+        Tutkittava: <br>
+        <div class="rastiruutu"><input type="checkbox" class="tarkista" checked /> Lapsi </div>
+        <div class="rastiruutu"><input type="checkbox" class="tarkista" checked /> &Auml;iti </div>
+        <div class="rastiruutu mb-15px"><input type="checkbox" class="tarkista" checked /> Puoliso </div>
+        <button onClick='hakukutsuttu();'>Haku</button>
+      </div>
+      <div class="haku-ohjeet paneeli mt--15px">
+        Valitse ensin, mist&auml; tiedoista olet kiinnostunut:
+        <ul>
+          <li>Biologiset n&auml;ytteet: Tallennustiedot n&auml;ytteist&auml; </li>
+          <li>Lomakkeet: Kyselylomakkeiden kysymykset ja niiden tallennustiedot </li>
+          <li>Tutkimustiedot: Mit&auml; n&auml;ytteit&auml; on otettu kenest&auml;kin tutkittavasta (Lomaketiedoilla ei mahdollista valita tutkittavaa.) </li>
+        </ul>
+        Sarakkeiden selitteit&auml;:
+        <ul>
+          <li>Menetelm&auml; 1 = Paperi / 2 = Webropol</li>
+          <li>Tutkittava 1 = Lapsi / 2 = &Auml;iti / 3 = Is&auml;</li>
+          <li>L&auml;hetetty 1 = Lapsi / 2 = &Auml;iti / 3 = Is&auml; / 4 = P&auml;iv&auml;hoidon henkil&ouml;kunta tai opettaja</li>
+          <li>MP = Mittauspiste raskausviikkoina tai lapsen ik&auml;n&auml; </li>
+          <li>KK = Kuinka monta kuukautta on lapsen syntym&auml;st&auml;</li>
+          <li>Validoitu mittari (VAL) 0 = Ei / 1 = Kyll&auml;</li>
+        </ul>
+      </div>
+  </div>
+  <table id="result" class="paneeli">
+    <h2 id="tila">  </h2>
+    <colgroup>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col/>
+      <col style="width: 2px"/>
+    </colgroup>
+  </table>
+</body>
+
+</html>
